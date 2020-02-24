@@ -104,10 +104,17 @@ module.exports = class Bank {
                             let find = this.createfindQuery(res, updateQuery);
                             let update = {}; update[updateQuery] = "";
                             console.log("Find: ", find, "Update: ", update);
-                            db.collection("Demo").updateOne(find, { $unset: update }, (err, res) => {
-                                if (err) console.log("Error: ", err.message);
-                                resolve(1);
-                            });
+                            if(updateQuery.split(".").length == 1){
+                                db.collection("Demo").deleteOne(find, (err, res) => {
+                                    if(err) throw reject(err);
+                                    resolve(1);
+                                });
+                            } else {
+                                db.collection("Demo").updateOne(find, { $unset: update }, (err, res) => {
+                                    if (err) console.log("Error: ", err.message);
+                                    resolve(1);
+                                });
+                            }
                         }
                     });
                 });
