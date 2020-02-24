@@ -66,7 +66,7 @@ const addForm = (listNode, div, { type, target, valuePlaceholder = "value" }) =>
     value.type = "text";
     value.name = "value";
     addBtn.type = "submit";
-    addBtn.value = "Add";
+    addBtn.value = type;
     if (type == "add") {
         const key = document.createElement("input");
         key.type = value.type = "text";
@@ -88,7 +88,7 @@ const addForm = (listNode, div, { type, target, valuePlaceholder = "value" }) =>
 
 const makeQuery = (node) => {
 
-    let query = "" + node.innerHTML;
+    let query = "" + node.innerHTML.split(":")[0];
     while (node.parentElement.previousElementSibling != null) {
         node = node.parentElement.previousElementSibling;
         if (node.nodeName == "LI" && node.innerHTML != "parent") {

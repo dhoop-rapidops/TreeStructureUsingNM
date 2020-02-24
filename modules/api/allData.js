@@ -79,6 +79,7 @@ module.exports = class Bank {
                         }
                     });
                     if (!isExist) {
+                        if (updateQuery.toString().length == 0) throw reject(new Error("Cannot created document with empty key"));
                         let data = {}; data[updateQuery.toString()] = value;
                         db.collection("Demo").insertOne(data, (err, res) => {
                             if (err) return reject(err);
@@ -108,6 +109,46 @@ module.exports = class Bank {
                                 resolve(1);
                             });
                         }
+                    });
+                });
+            });
+        });
+    }
+
+    moveData = (source, destination) => {
+        return new Promise((resolve, reject) => {
+            mongoClient.connect(url, { useUnifiedTopology: true, useNewUrlParser: true }, (err, client) => {
+                if (err) return reject(err);
+                const db = client.db(databaseName);
+                db.collection("Demo").find({}, { projection: { _id: 0 } }).toArray((err, results) => {
+                    if (err) return reject(err);
+                    let find = {};
+                    let moveQuery = {};
+                    results.forEach((res) => {
+                        if (destination.split(".")[0] == Object.entries(res)[0][0]) {
+                            find = this.createfindQuery(res, destination);
+                        }
+                        if (source.split(".")[0] == Object.entries(res)[0][0]) {
+                            let sourceNodes = source.split(".");
+                            let doc = res;
+                            sourceNodes.forEach((point) => {
+                                doc = doc[point];
+                            });
+                            moveQuery[source] = doc;
+                        }
+                    });
+
+                    let unset = {}; unset[source] = "";
+                    console.log('find: ', moveQuery, "unset: ", unset);
+                    let updateQuery = {}; updateQuery[destination+"."+source.split(".").pop()] = moveQuery[source];
+                    console.log("then find: ", find, " set: ", updateQuery);
+
+                    db.collection("Demo").updateOne(moveQuery, { $unset: unset }, (err, res) => {
+                        if(err) return reject(err);
+                        db.collection("Demo").updateOne(find, { $set: updateQuery}, (err, res) => {
+                            if(err) return reject(err);
+                            resolve(1);
+                        });
                     });
                 });
             });

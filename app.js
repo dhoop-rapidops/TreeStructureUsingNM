@@ -42,6 +42,14 @@ app.post("/index", urlEncoder, (req, res) => {
             }).catch((err) => {
                 console.log("Err : " + err.message);
             });
+    } else if (req.body.action == "move") {
+        console.log(req.body);
+        bank.moveData(req.body.query, req.body.value)
+            .then((val) => {
+                console.log(val);
+            }).catch((err) => {
+                console.log("Err : " + err.message);
+            });
     }
     fs.createReadStream(__dirname + "/index.html").pipe(res);
 });

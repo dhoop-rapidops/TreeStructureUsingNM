@@ -22,11 +22,11 @@ li{
     width: fit-content;
     list-style-type: none;
     cursor: pointer;
-    padding: 5px;
+    padding: 3px;
 }
 
 ul {
-    margin: 5px;
+    margin: 3px;
 }
 
 li::before{
