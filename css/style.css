@@ -1,0 +1,67 @@
+body{
+    font-size: 20px;
+}
+/*
+.mydiv{
+    position: relative;
+    left: -100px;
+    display: none;
+}
+
+li:hover .mydiv{
+    display: inline-block;
+    animation: slide 0.5s forwards;
+}
+
+@keyframes slide{
+    100% {left: 0px;}
+}
+
+*/
+li{
+    width: fit-content;
+    list-style-type: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+ul {
+    margin: 5px;
+}
+
+li::before{
+    content: "\21b3";
+}
+
+.controllerDiv{
+    display: inline-block;
+}
+
+.controllerDiv button,
+form input[type="button"]{
+    cursor: pointer;
+    border: 0px;
+    border: 1px solid #fff;
+    background-color: #555;
+    color: #fff;
+    padding: 3px;
+    margin: 0px 3px;
+}
+
+.controllerDiv button:hover,
+form input[type="button"]:hover{
+    color:#333;
+    background-color: #fff;
+    border: 1px solid #555;
+}
+
+form{
+    display: inline-block;
+    margin: 0px 2px;
+}
+
+form input[type="text"] {
+    min-width: 150px;
+    margin: 0px 2px;
+    font-size: 16px;
+}
