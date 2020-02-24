@@ -17,19 +17,34 @@ app.get('/index', (req, res) => {
 
 
 app.post("/index", urlEncoder, (req, res) => {
-    console.log("body--", req.body);
-    if(req.body.action == "add") {
-        
+    if (req.body.action == "add") {
+        console.log(req.body);
+        let find = req.body.query == "parent" ? req.body.key : req.body.query + "." + req.body.key;
+        bank.insertData(find, req.body.value == '' ? {} : req.body.value)
+            .then((val) => {
+                console.log(val);
+            }).catch((err) => {
+                console.log("Err : " + err.message);
+            });
+    } else if (req.body.action == "update") {
+        console.log(req.body);
+        bank.updateData(req.body.query.split(":")[0], req.body.value)
+            .then((val) => {
+                console.log(val);
+            }).catch((err) => {
+                console.log("Err : " + err.message);
+            });
+    } else if (req.body.action == "remove") {
+        console.log(req.body);
+        bank.deleteData(req.body.query.split(":")[0])
+            .then((val) => {
+                console.log(val);
+            }).catch((err) => {
+                console.log("Err : " + err.message);
+            });
     }
     fs.createReadStream(__dirname + "/index.html").pipe(res);
 });
-
-
-
-
-
-
-
 
 
 
@@ -39,14 +54,6 @@ app.get("/api/alldata", (req, res) => {
     });
     bank.allData().then((result) => {
         res.send(JSON.stringify(result));
-    }).catch((err) => {
-        throw err;
-    });
-});
-
-app.get("/api/add", (req, res) => {
-    bank.insertData().then((result) => {
-        res.send(result);
     }).catch((err) => {
         throw err;
     });
