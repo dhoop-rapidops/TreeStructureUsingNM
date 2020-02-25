@@ -54,6 +54,7 @@ const addForm = (listNode, div, { type, target, valuePlaceholder = "value" }) =>
     form.action = "/index";
     form.method = "POST";
     const value = document.createElement("input");
+    value.required = "required";
     const addBtn = document.createElement("input");
     const actionToPerform = document.createElement("input");
     const queryToFind = document.createElement("input");
@@ -71,6 +72,7 @@ const addForm = (listNode, div, { type, target, valuePlaceholder = "value" }) =>
         const key = document.createElement("input");
         key.type = value.type = "text";
         key.name = key.placeholder = "key";
+        key.required = "require";
         form.append(key);
     }
     value.placeholder = valuePlaceholder;

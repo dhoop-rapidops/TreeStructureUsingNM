@@ -42,7 +42,7 @@ module.exports = class Bank {
 
                     results.forEach((res) => {
                         if (updateQuery.split(".")[0] == Object.entries(res)[0][0]) {
-                            let find = this.createfindQuery(res, updateQuery);
+                            let [find, isNew] = this.createfindQuery(res, updateQuery);
                             let update = {}; update[updateQuery] = value;
                             console.log("Find: ", find, "Update: ", update);
                             db.collection("Demo").updateOne(find, { $set: update }, (err, res) => {
@@ -69,13 +69,19 @@ module.exports = class Bank {
                     results.forEach((res) => {
                         if (updateQuery.split(".")[0] == Object.entries(res)[0][0]) {
                             isExist = true;
-                            let find = this.createfindQuery(res, updateQuery);
+                            let [find, isNew] = this.createfindQuery(res, updateQuery);
                             let update = {}; update[updateQuery] = value;
                             console.log("Find: ", find, "Update: ", update);
-                            db.collection("Demo").updateOne(find, { $set: update }, (err, res) => {
-                                if (err) console.log("Error: ", err.message);
-                                resolve(1);
-                            });
+
+                            if (isNew) {
+                                db.collection("Demo").updateOne(find, { $set: update }, (err, res) => {
+                                    if (err) console.log("Error: ", err.message);
+                                    resolve(1);
+                                });
+                            } else {
+                                reject(new Error("Field already Exist"));
+                            }
+
                         }
                     });
                     if (!isExist) {
@@ -101,12 +107,12 @@ module.exports = class Bank {
                     if (err) return reject(err);
                     results.forEach((res) => {
                         if (updateQuery.split(".")[0] == Object.entries(res)[0][0]) {
-                            let find = this.createfindQuery(res, updateQuery);
+                            let [find, isNew] = this.createfindQuery(res, updateQuery);
                             let update = {}; update[updateQuery] = "";
                             console.log("Find: ", find, "Update: ", update);
-                            if(updateQuery.split(".").length == 1){
+                            if (updateQuery.split(".").length == 1) {
                                 db.collection("Demo").deleteOne(find, (err, res) => {
-                                    if(err) throw reject(err);
+                                    if (err) throw reject(err);
                                     resolve(1);
                                 });
                             } else {
@@ -129,11 +135,11 @@ module.exports = class Bank {
                 const db = client.db(databaseName);
                 db.collection("Demo").find({}, { projection: { _id: 0 } }).toArray((err, results) => {
                     if (err) return reject(err);
-                    let find = {};
+                    let find = {}, isNew;
                     let moveQuery = {};
                     results.forEach((res) => {
                         if (destination.split(".")[0] == Object.entries(res)[0][0]) {
-                            find = this.createfindQuery(res, destination);
+                            [find, isNew] = this.createfindQuery(res, destination);
                         }
                         if (source.split(".")[0] == Object.entries(res)[0][0]) {
                             let sourceNodes = source.split(".");
@@ -147,13 +153,15 @@ module.exports = class Bank {
 
                     let unset = {}; unset[source] = "";
                     console.log('find: ', moveQuery, "unset: ", unset);
-                    let updateQuery = {}; updateQuery[destination+"."+source.split(".").pop()] = moveQuery[source];
+                    let updateQuery = {}; updateQuery[destination + "." + source.split(".").pop()] = moveQuery[source];
                     console.log("then find: ", find, " set: ", updateQuery);
-
+                    if (typeof find == "object" && Object.keys(find) == 0) {
+                        reject(new Error("Invalid Destination Address"));
+                    }
                     db.collection("Demo").updateOne(moveQuery, { $unset: unset }, (err, res) => {
-                        if(err) return reject(err);
-                        db.collection("Demo").updateOne(find, { $set: updateQuery}, (err, res) => {
-                            if(err) return reject(err);
+                        if (err) return reject(err);
+                        db.collection("Demo").updateOne(find, { $set: updateQuery }, (err, res) => {
+                            if (err) return reject(err);
                             resolve(1);
                         });
                     });
@@ -165,11 +173,13 @@ module.exports = class Bank {
     createfindQuery = (document, query) => {
         let queryNodes = query.split(".");
         let doc = document;
+        let isNew = false;
         for (let i = 0; i < queryNodes.length; i++) {
             if (doc[queryNodes[i]] != undefined) {
                 doc = doc[queryNodes[i]];
             } else {
-                console.log("doc not exist: " + queryNodes[i]);
+                console.log("field not exist: " + queryNodes[i]);
+                isNew = true;
                 queryNodes.pop();
             }
         }
@@ -177,13 +187,13 @@ module.exports = class Bank {
         let findquery = {};
         if (typeof doc === "object" && Object.keys(doc).length == 0) {
             findquery[queryNodes.join(".")] = {};
-            return findquery;
+            return [findquery, isNew];
         } else if (typeof doc === "object") {
             findquery[queryNodes.join(".") + "." + Object.entries(doc)[0][0]] = Object.entries(doc)[0][1];
-            return findquery;
+            return [findquery, isNew];
         } else {
             findquery[queryNodes.join(".")] = doc;
-            return findquery;
+            return [findquery, isNew];
         }
     }
 

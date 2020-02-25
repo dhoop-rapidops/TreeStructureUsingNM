@@ -22,36 +22,56 @@ app.post("/index", urlEncoder, (req, res) => {
         let find = req.body.query == "parent" ? req.body.key : req.body.query + "." + req.body.key;
         bank.insertData(find, req.body.value == '' ? {} : req.body.value)
             .then((val) => {
+                fs.createReadStream(__dirname + "/index.html").pipe(res);
                 console.log(val);
             }).catch((err) => {
+                res.set({
+                    'content-type': 'text/plain'
+                });
+                res.send("Error: " + err.message);
                 console.log("Err : " + err.message);
             });
     } else if (req.body.action == "update") {
         console.log(req.body);
         bank.updateData(req.body.query.split(":")[0], req.body.value)
             .then((val) => {
+                fs.createReadStream(__dirname + "/index.html").pipe(res);
                 console.log(val);
             }).catch((err) => {
+                res.set({
+                    'content-type': 'text/plain'
+                });
+                res.send("Error: " + err.message);
                 console.log("Err : " + err.message);
             });
     } else if (req.body.action == "remove") {
         console.log(req.body);
         bank.deleteData(req.body.query.split(":")[0])
             .then((val) => {
+                fs.createReadStream(__dirname + "/index.html").pipe(res);
                 console.log(val);
             }).catch((err) => {
+                res.set({
+                    'content-type': 'text/plain'
+                });
+                res.send("Error: " + err.message);
                 console.log("Err : " + err.message);
             });
     } else if (req.body.action == "move") {
         console.log(req.body);
         bank.moveData(req.body.query, req.body.value)
             .then((val) => {
+                fs.createReadStream(__dirname + "/index.html").pipe(res);
                 console.log(val);
             }).catch((err) => {
+                res.set({
+                    'content-type': 'text/plain'
+                });
+                res.send("Error: " + err.message);
                 console.log("Err : " + err.message);
             });
     }
-    fs.createReadStream(__dirname + "/index.html").pipe(res);
+    //fs.createReadStream(__dirname + "/index.html").pipe(res);
 });
 
 
