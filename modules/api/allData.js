@@ -47,7 +47,8 @@ module.exports = class Bank {
                             console.log("Find: ", find, "Update: ", update);
                             db.collection("Demo").updateOne(find, { $set: update }, (err, res) => {
                                 if (err) console.log("Error: ", err.message);
-                                resolve(1);
+                                client.close();
+                                return resolve(1);
                             });
                         }
                     });
@@ -90,6 +91,7 @@ module.exports = class Bank {
                         db.collection("Demo").insertOne(data, (err, res) => {
                             if (err) return reject(err);
                             client.close();
+                            resolve(1);
                         });
                     }
                 });
@@ -112,12 +114,12 @@ module.exports = class Bank {
                             console.log("Find: ", find, "Update: ", update);
                             if (updateQuery.split(".").length == 1) {
                                 db.collection("Demo").deleteOne(find, (err, res) => {
-                                    if (err) throw reject(err);
+                                    if (err) reject(err);
                                     resolve(1);
                                 });
                             } else {
                                 db.collection("Demo").updateOne(find, { $unset: update }, (err, res) => {
-                                    if (err) console.log("Error: ", err.message);
+                                    if (err) reject(err);
                                     resolve(1);
                                 });
                             }
@@ -157,14 +159,15 @@ module.exports = class Bank {
                     console.log("then find: ", find, " set: ", updateQuery);
                     if (typeof find == "object" && Object.keys(find) == 0) {
                         reject(new Error("Invalid Destination Address"));
-                    }
-                    db.collection("Demo").updateOne(moveQuery, { $unset: unset }, (err, res) => {
-                        if (err) return reject(err);
-                        db.collection("Demo").updateOne(find, { $set: updateQuery }, (err, res) => {
+                    } else {
+                        db.collection("Demo").updateOne(moveQuery, { $unset: unset }, (err, res) => {
                             if (err) return reject(err);
-                            resolve(1);
+                            db.collection("Demo").updateOne(find, { $set: updateQuery }, (err, res) => {
+                                if (err) return reject(err);
+                                resolve(1);
+                            });
                         });
-                    });
+                    }
                 });
             });
         });

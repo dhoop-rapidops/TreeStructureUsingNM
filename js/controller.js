@@ -54,7 +54,6 @@ const addForm = (listNode, div, { type, target, valuePlaceholder = "value" }) =>
     form.action = "/index";
     form.method = "POST";
     const value = document.createElement("input");
-    value.required = "required";
     const addBtn = document.createElement("input");
     const actionToPerform = document.createElement("input");
     const queryToFind = document.createElement("input");
