@@ -12,6 +12,7 @@ const removeController = async (event) => {
 const appendController = async (event) => {
     const listNode = event.target;
     const query = makeQuery(listNode);
+    console.log(query);
     const div = document.createElement("div");
     const addUpdateBtn = document.createElement("button");
     if (listNode.dataset.node == "child") {
@@ -89,11 +90,11 @@ const addForm = (listNode, div, { type, target, valuePlaceholder = "value" }) =>
 
 const makeQuery = (node) => {
 
-    let query = "" + node.innerHTML.split(":")[0];
+    let query = "" + node.innerText.split(":")[0];
     while (node.parentElement.previousElementSibling != null) {
         node = node.parentElement.previousElementSibling;
         if (node.nodeName == "LI" && node.innerHTML != "parent") {
-            query += "." + node.innerHTML;
+            query += "." + node.innerText;
         }
     }
     return query.split(".").reverse().join(".");
