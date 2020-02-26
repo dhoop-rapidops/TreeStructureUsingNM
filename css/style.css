@@ -56,9 +56,9 @@ form input[type="text"] {
 
 .line {
     height: 20px;
-    width: 2px;
+    width: 1px;
+    border-right: 2px dashed black;
     bottom: 10px;
-    right: 10px;
+    right: 11px;
     position: absolute;
-    background-color: #333;
 }
