@@ -2,6 +2,7 @@ const mongoClient = require('mongodb').MongoClient;
 
 const url = 'mongodb://localhost:27018/';
 const databaseName = "Bank";
+const collection_name = "Demo";
 
 module.exports = class Bank {
 
@@ -22,7 +23,7 @@ module.exports = class Bank {
             mongoClient.connect(url, { useUnifiedTopology: true, useNewUrlParser: true }, (err, client) => {
                 if (err) reject(err);
                 const db = client.db(databaseName);
-                db.collection("Demo").find({}, { projection: { _id: 0 } }).toArray((err, results) => {
+                db.collection(collection_name).find({}, { projection: { _id: 0 } }).toArray((err, results) => {
                     if (err) return reject(err);
                     client.close();
                     return resolve(results);
@@ -37,7 +38,7 @@ module.exports = class Bank {
                 if (err) return reject(err);
                 const db = client.db(databaseName);
 
-                db.collection("Demo").find({}, { projection: { _id: 0 } }).toArray((err, results) => {
+                db.collection(collection_name).find({}, { projection: { _id: 0 } }).toArray((err, results) => {
                     if (err) return reject(err);
 
                     results.forEach((res) => {
@@ -45,7 +46,7 @@ module.exports = class Bank {
                             let [find, isNew] = this.createfindQuery(res, updateQuery);
                             let update = {}; update[updateQuery] = value;
                             console.log("Find: ", find, "Update: ", update);
-                            db.collection("Demo").updateOne(find, { $set: update }, (err, res) => {
+                            db.collection(collection_name).updateOne(find, { $set: update }, (err, res) => {
                                 if (err) console.log("Error: ", err.message);
                                 client.close();
                                 return resolve(1);
@@ -63,7 +64,7 @@ module.exports = class Bank {
                 if (err) return reject(err);
                 const db = client.db(databaseName);
 
-                db.collection("Demo").find({}, { projection: { _id: 0 } }).toArray((err, results) => {
+                db.collection(collection_name).find({}, { projection: { _id: 0 } }).toArray((err, results) => {
                     if (err) return reject(err);
 
                     let isExist = false;
@@ -75,7 +76,7 @@ module.exports = class Bank {
                             console.log("Find: ", find, "Update: ", update);
 
                             if (isNew) {
-                                db.collection("Demo").updateOne(find, { $set: update }, (err, res) => {
+                                db.collection(collection_name).updateOne(find, { $set: update }, (err, res) => {
                                     if (err) console.log("Error: ", err.message);
                                     resolve(1);
                                 });
@@ -88,7 +89,7 @@ module.exports = class Bank {
                     if (!isExist) {
                         if (updateQuery.toString().length == 0) throw reject(new Error("Cannot created document with empty key"));
                         let data = {}; data[updateQuery.toString()] = value;
-                        db.collection("Demo").insertOne(data, (err, res) => {
+                        db.collection(collection_name).insertOne(data, (err, res) => {
                             if (err) return reject(err);
                             client.close();
                             resolve(1);
@@ -105,7 +106,7 @@ module.exports = class Bank {
                 if (err) return reject(err);
                 const db = client.db(databaseName);
 
-                db.collection("Demo").find({}, { projection: { _id: 0 } }).toArray((err, results) => {
+                db.collection(collection_name).find({}, { projection: { _id: 0 } }).toArray((err, results) => {
                     if (err) return reject(err);
                     results.forEach((res) => {
                         if (updateQuery.split(".")[0] == Object.entries(res)[0][0]) {
@@ -113,12 +114,12 @@ module.exports = class Bank {
                             let update = {}; update[updateQuery] = "";
                             console.log("Find: ", find, "Update: ", update);
                             if (updateQuery.split(".").length == 1) {
-                                db.collection("Demo").deleteOne(find, (err, res) => {
+                                db.collection(collection_name).deleteOne(find, (err, res) => {
                                     if (err) reject(err);
                                     resolve(1);
                                 });
                             } else {
-                                db.collection("Demo").updateOne(find, { $unset: update }, (err, res) => {
+                                db.collection(collection_name).updateOne(find, { $unset: update }, (err, res) => {
                                     if (err) reject(err);
                                     resolve(1);
                                 });
@@ -135,7 +136,7 @@ module.exports = class Bank {
             mongoClient.connect(url, { useUnifiedTopology: true, useNewUrlParser: true }, (err, client) => {
                 if (err) return reject(err);
                 const db = client.db(databaseName);
-                db.collection("Demo").find({}, { projection: { _id: 0 } }).toArray((err, results) => {
+                db.collection(collection_name).find({}, { projection: { _id: 0 } }).toArray((err, results) => {
                     if (err) return reject(err);
                     let find = {}, isNew;
                     let moveQuery = {};
@@ -160,9 +161,9 @@ module.exports = class Bank {
                     if (typeof find == "object" && Object.keys(find) == 0) {
                         reject(new Error("Invalid Destination Address"));
                     } else {
-                        db.collection("Demo").updateOne(moveQuery, { $unset: unset }, (err, res) => {
+                        db.collection(collection_name).updateOne(moveQuery, { $unset: unset }, (err, res) => {
                             if (err) return reject(err);
-                            db.collection("Demo").updateOne(find, { $set: updateQuery }, (err, res) => {
+                            db.collection(collection_name).updateOne(find, { $set: updateQuery }, (err, res) => {
                                 if (err) return reject(err);
                                 resolve(1);
                             });
